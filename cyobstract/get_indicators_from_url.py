@@ -33,6 +33,13 @@ def get_urls(URL, ignore_missing=False):
     log.debug("Fetching URL: {0}".format(URL))
     r = requests.get(URL)
     soup = BeautifulSoup(r.text, 'html.parser')
+    # remove all scripts
+    not_content = ['script', 'head',
+                   'header', 'footer',
+                   'style', 'comment',
+                   'foot', 'meta']
+    for tag in not_content:
+        [s.extract() for s in soup(tag)]
     text = soup.text
     results = extract.extract_observables(text)
     # print(results)
