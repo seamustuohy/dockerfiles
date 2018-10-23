@@ -1,0 +1,126 @@
+#
+# This file is a deriviticve of Viper - https://github.com/viper-framework/viper
+# See the file 'LICENSE' for copying permission.
+#
+
+FROM ubuntu:rolling
+MAINTAINER Seamus Tuohy <code@seamustuohy.com>
+
+## ===> CUSTOMIZE HERE <====
+# If you have a specific radare repo you customize do it here.
+ARG RADARE_REPO_URL="https://github.com/radare/radare2.git"
+ARG RADARE_BRANCH="master"
+
+# Set Local
+ENV LANG C.UTF-8
+
+# === Viper Base & Intallation Dependencies ===
+USER root
+RUN apt-get update && apt-get install -y \
+    git \
+    gcc \
+    python3-dev \
+    python3-pip \
+    sudo \
+    --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create Viper User
+# Running all commands as a non-root sudo privlaged user to recreate a real install
+RUN groupadd -r viper && \
+  useradd -r -g viper -d /home/viper -s /bin/bash -c "Viper User" viper && \
+  mkdir /home/viper && \
+  chown -R viper:viper /home/viper
+
+# Make passwordless sudo'er for demonstration purposes
+RUN echo "viper ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+# Become our non-root example user
+USER viper
+
+# Viper Dependencies
+RUN sudo apt-get update && \
+    sudo apt-get install -y \
+         libssl-dev \
+         swig \
+         libffi-dev \
+         ssdeep `# Fuzzy Module` \
+         libfuzzy-dev `# Fuzzy Module` \
+         exiftool `# PyExifTool` \
+         unrar `# Archive Core Module` \
+         p7zip-full  `# Archive Core Module` \
+         --no-install-recommends && \
+     sudo rm -rf /var/lib/apt/lists/*
+
+RUN sudo -H pip3 install setuptools wheel --upgrade
+
+# === Tor Support ===
+ENV TOR_ENABLED True
+RUN sudo apt-get update && \
+    sudo apt-get install -y \
+          tor \
+          --no-install-recommends && \
+    sudo rm -rf /var/lib/apt/lists/*
+# === TOR END ===
+
+
+# === ClamAV ===
+ENV CLAMAV_ENABLED True
+RUN sudo apt-get update && \
+    sudo apt-get install -y \
+        clamav-daemon \
+        --no-install-recommends && \
+    sudo rm -rf /var/lib/apt/lists/*
+
+RUN sudo freshclam
+RUN sudo mkdir /var/run/clamav && \
+    sudo chown clamav:clamav /var/run/clamav && \
+    sudo chmod 750 /var/run/clamav
+# === CLAMAV END ===
+
+# === RADARE ===
+ENV RADARE_ENABLED True
+RUN sudo apt-get update && \
+    sudo apt-get install -y \
+         patch \
+         make \
+         --no-install-recommends && \
+    sudo rm -rf /var/lib/apt/lists/*
+
+# Get latest radare2 release and build it
+WORKDIR /home/viper
+RUN git clone "${RADARE_REPO_URL}" \
+    && cd radare2 \
+    && git checkout "${RADARE_BRANCH}" \
+    && ./sys/user.sh
+
+# # Add Radare to the environment
+ENV PATH="/home/viper/bin:${PATH}"
+# === RADARE END ===
+
+# === Scraper Support (And General Twisted Support) ===
+ENV SCRAPER_ENABLED True
+RUN sudo apt-get update && \
+    sudo apt-get install -y \
+         libdpkg-perl \
+         --no-install-recommends && \
+    sudo rm -rf /var/lib/apt/lists/*
+# === SCRAPER END ===
+
+
+# Testing & Debugging Dependencies
+RUN sudo -H pip3 install flake8 pytest pytest-cov pytest-django tox
+
+COPY entrypoint.sh /usr/local/bin/
+ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
+
+# Swap back to root user for the entrypoint setup script
+USER root
+WORKDIR /home/viper/viper
+
+# Comment for Developer use
+CMD ["viper-cli", "-p", "malware"]
+
+## Uncomment for Developer Use
+## It will auto-run pytest if started without "bash" as the command
+# CMD ["sudo" "-u" "viper" "pytest"]

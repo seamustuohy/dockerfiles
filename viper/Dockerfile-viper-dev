@@ -1,0 +1,15 @@
+FROM s2e/viper_base
+MAINTAINER Seamus Tuohy <code@seamustuohy.com>
+
+# Install Testing & Debugging Dependencies
+RUN sudo -H pip3 install flake8 pytest pytest-cov pytest-django tox
+
+# Copy over Viper entrypoint file for setting up tor and clamav
+COPY entrypoint.sh /usr/local/bin/
+ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
+
+# Swap back to root user for the entrypoint setup script
+USER root
+WORKDIR /home/viper/viper
+## It will auto-run pytest if started without "bash" as the command
+CMD ["sudo", "-u", "viper", "pytest"]

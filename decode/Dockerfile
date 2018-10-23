@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y python3 \
 
 # Will force rebuild from this point based on the date
 # See installer for info
-ARG GIT_CACHE_DATE="2018-04-10"
+ARG GIT_CACHE_DATE="2018-10-10"
 
 RUN git clone https://github.com/seamustuohy/Decodify \
     && cd Decodify \
@@ -25,4 +25,5 @@ RUN git clone https://github.com/seamustuohy/Decodify \
 RUN echo 'alias python="python3"' >> ~/.bashrc
 
 # run the application
-CMD [ "dcode" ]
+# -s turns on sensitive data option
+CMD [ "dcode"]

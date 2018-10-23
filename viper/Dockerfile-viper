@@ -1,0 +1,11 @@
+FROM s2e/viper_base
+MAINTAINER Seamus Tuohy <code@seamustuohy.com>
+
+# Copy over Viper entrypoint file for setting up tor and clamav
+COPY entrypoint.sh /usr/local/bin/
+ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
+
+# Swap back to root user for the entrypoint setup script
+USER root
+WORKDIR /home/viper
+CMD ["viper/viper-cli", "-p", "malware"]

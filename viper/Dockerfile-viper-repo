@@ -1,0 +1,28 @@
+FROM s2e/viper_depends
+MAINTAINER Seamus Tuohy <code@seamustuohy.com>
+
+## ===> CUSTOMIZE HERE <====
+# If you have a specific viper repo you customize do it here.
+ARG VIPER_REPO_URL="https://github.com/seamustuohy/viper"
+# pick a branch of the viper repo to use
+ARG VIPER_BRANCH="master"
+
+# Will force rebuild from this point based on the date
+# See installer for info
+ARG GIT_CACHE_DATE="2018-08-26-09"
+
+## TO USE LOCAL CODEBASE
+# WORKDIR /home/viper
+# COPY code/viper viper
+# RUN sudo chown -R viper:viper viper
+## DELETE ME END
+
+WORKDIR /home/viper
+RUN git clone "${VIPER_REPO_URL}" \
+    && cd viper \
+    && git checkout "${VIPER_BRANCH}" \
+    && git submodule init \
+    && git submodule update
+
+WORKDIR /home/viper/viper
+RUN sudo -H pip3 install .
