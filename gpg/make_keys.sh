@@ -230,6 +230,8 @@ output_keys() {
     log "Outputting public keys"
     gpg --armor --export "${EMAIL_ADDR}" \
         > exported_keys/${EMAIL_ADDR}-public_gpg_key.asc
+    gpg2 --export-ssh-key "${EMAIL_ADDR}" \
+        > exported_keys/${EMAIL_ADDR}-public_gpg_ssh_key.pub
     log "Outputting revocation certificate"
     gpg --gen-revoke "${EMAIL_ADDR}" \
         > exported_keys/revocation-certificate_for_all_keys.asc
