@@ -5,6 +5,33 @@ These are dockerfiles for software that I don't maintain. They usually have a RE
 These are dockerfile, not VM's. So, don't assume the malware analysis Dockerfiles do ANYTHING to protect the device against malicious binaries. Be cautious when running these anywhere but on a cloud service. Generally, I stick to static analysis on these.
 
 
+# How to install individual docker containers
+
+If a docker container does not have a readme with install instructions in the folder you can use the following to install it.
+
+Download dockerfiles
+
+```sh
+git clone https://github.com/seamustuohy/dockerfiles.git
+cd dockerfiles
+```
+
+Source docker helpers
+
+```sh
+source ./docker_helpers.sh
+```
+
+Go to the folder of the dockerfile in question (using decode as an example) and run the docker builder.
+
+```sh
+container_name="decode"
+cd "${container_name}"
+docker_build_container . "${container_name}"
+```
+
+
+
 # Utility Bash Alias' for individual Docker Alias'
 Borrowed from [JessFraz](https://github.com/jessfraz/dotfiles/blob/master/.dockerfunc). You should take a look at her stuff.
 ```bash
