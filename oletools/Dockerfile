@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -y \
     python \
     python-pip \
     python-dev \
+    python-yara \
     make \
     unzip \
     wget \
