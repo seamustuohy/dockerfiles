@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
     gcc \
     wget \
     curl \
+    less \
     zip \
     whois \
     urlview \
@@ -25,6 +26,7 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     libssl-dev \
     python3-socks \
+    less
     make \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*

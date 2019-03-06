@@ -114,6 +114,8 @@ set +u
 run_command="$1"
 path_to_local_viper_codebase="$2"
 set -u
+
+
 if [[ "$run_command" == "bash" ]]; then
     # Run the normal viper image but to a shell instead of viper-cli
     main "${image_name}"

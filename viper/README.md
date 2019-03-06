@@ -46,7 +46,6 @@ viper() {
         -it \
         --name viper \
         ${DOCKER_REPO_PREFIX}/viper
-        ../viper/viper.py -p malware
 }
 ```
 
